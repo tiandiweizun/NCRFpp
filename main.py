@@ -317,7 +317,7 @@ def batchify_sentence_classification_with_label(input_batch_list, gpu, if_train=
 
     batch_size = len(input_batch_list)
     words = [sent[0] for sent in input_batch_list]
-    features = [np.asarray(sent[1]) for sent in input_batch_list]    
+    features = [np.asarray(sent[1]) for sent in input_batch_list]
     feature_num = len(features[0])
     chars = [sent[2] for sent in input_batch_list]
     labels = [sent[3] for sent in input_batch_list]
@@ -480,7 +480,8 @@ def train(data):
                 print("Exceed previous best f score:", best_dev)
             else:
                 print("Exceed previous best acc score:", best_dev)
-            model_name = data.model_dir +'.'+ str(idx) + ".model"
+            # model_name = data.model_dir +'.'+ str(idx) + ".model"
+            model_name = data.model_dir + ".model"
             print("Save current best model in file:", model_name)
             torch.save(model.state_dict(), model_name)
             best_dev = current_score
@@ -525,11 +526,15 @@ def load_model_decode(data, name):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Tuning with NCRF++')
     # parser.add_argument('--status', choices=['train', 'decode'], help='update algorithm', default='train')
-    parser.add_argument('--config',  help='Configuration File' )
-
+    # parser.add_argument('--config',  help='Configuration File' )
+    parser.add_argument('--config', help='Configuration File', default="demo.train.config")
+    parser.add_argument('--gpu', help='Configuration File', default="0")
     args = parser.parse_args()
     data = Data()
     data.HP_gpu = torch.cuda.is_available()
+    if data.HP_gpu:
+        print('gpu:', args.gpu)
+        torch.cuda.set_device(int(args.gpu))
     data.read_config(args.config)
     data.show_data_summary()
     status = data.status.lower()
